@@ -78,40 +78,6 @@ Then in section~\ref{sec:design}, we give an overview and detailed design of the
 We follow this in section~\ref{sec:evaluation} with an evaluation of the software and sample output.
 Finally, we briefly draw some conclusions in section~\ref{sec:conclusions}.
 
-\begin{figure}[*]
-\begin{lstlisting}
-void addNewRecord(char *comm, int uid, char *sys_call, int sys_call_index)
-{
-        recordPointer[sys_call_index]++;
-        strcpy(record[sys_call_index][recordPointer[sys_call_index]].comm,comm);
-        strcpy(record[sys_call_index][recordPointer[sys_call_index]].sys_call,sys_call);
-        record[sys_call_index][recordPointer[sys_call_index]].uid = uid;
-        if (recordPointer[sys_call_index] >= MAX_RECORDS) recordPointer[sys_call_index] = 0;
-        if (sysCallPointer >= 0) {
-                for (i = 0; i < MAX_SYS_CALLS; i++) {
-                        if (strcmp(record[i][0].sys_call,sys_call) == 0) { // Only do if initialized, and the sys_call is equal
-                                sysCallPresent = true;
-                                if (recordPointer[i] >= 0) {
-                                        for (j = 0; j < MAX_RECORDS; j++) {
-                                                if ((strcmp(record[i][j].comm,comm) == 0) && (record[i][j].uid == uid)) {
-                                                        recordPresent = true;
-                                                        record[i][j].count++;
-                                                        break;
-                                                }
-                                        }
-                                }
-                                if (!recordPresent) {
-                                        addNewRecord(comm,uid,sys_call,i);
-                                        break;
-                                }
-                        }
-                }
-                if (!sysCallPresent) addNewSysCall(comm,uid,sys_call);
-        }
-}
-\end{lstlisting}
-\end{figure}
-
 \section{Background}
 \label{sec:background}
 Instrumentation is not a new subject.
@@ -190,19 +156,51 @@ The tag is always the calling process image name.
 To store the recorded calls, we created our own custom data structure which houses the counts of each call based on the tag, user id, and system call name.
 The data structure is essentially a 2-dimensional array of structs which record the needed information.
 The first dimension is of size $16$ and is unique for each system call used.
-The second dimension is of size $1024$ and is used to store the count for a unique combination of user id and tag.
+The second dimension is of size $32$ and is used to store the count for a unique combination of user id and tag.
 
 When the \textit{cse812\_set()} function is called, the data structure is searched first for a match in terms of the system call.
 If a match is not found, then a new array of records is created, if all $16$ records have already been used, then it uses a \textit{FIFO} replacement scheme.
 In practice, one should ensure that enough records are present to handle all desired system calls.
 Once a match is found, then the second dimension is searched for the a match on both the tag and the user id.
 The same procedure is used if none are currently found with \textit{FIFO} replacement as well.
-Once a final match is identified, the count of calls is incremented by one.
+Once a final match is identified, the count of calls is incremented by one.  A code snippet detailing this logic flow can be found in Algorithm \ref{alg:set}.
+
+\begin{algorithm*}[t!]
+\begin{lstlisting}
+if (sysCallPointer >= 0) {
+	for (i = 0; i < MAX_SYS_CALLS; i++) {
+		if (strcmp(record[i][0].sys_call,sys_call) == 0) {
+			sysCallPresent = true;
+			if (recordPointer[i] >= 0) {
+				for (j = 0; j < MAX_RECORDS; j++) {
+				if ((strcmp(record[i][j].comm,comm) == 0) && ...
+					(record[i][j].uid == uid)) {
+						recordPresent = true;
+						record[i][j].count++;
+						break;
+					}
+				}
+			}
+		if (!recordPresent) {
+    		addNewRecord(comm,uid,sys_call,i);
+    		break;
+		}
+	}
+	if (!sysCallPresent) addNewSysCall(comm,uid,sys_call);
+}
+\end{lstlisting}
+\caption{Record storage mechanism.
+\label{alg:set}
+The logic involves checking if the first dimension of the array has the corresponding system call, then if the second dimension has the corresponding image and user id.
+The two if statements before each \textit{for} loop block recording unless the array has been initialized.
+This code is located in the \textit{sys\_stat.c} file, within the \textit{cse812\_set(...)} function.
+}
+\end{algorithm*}
 
 \subsection{Code Injection}
 All system calls go through a common entry point in assembly.
 Our initial vain though was to hook into this common entry point and be able to record for all system calls at the source.
-Since our knowledge of C was rusty, attempting to edit the assembly would be a silly idea.
+Since our knowledge of assembly was rusty, attempting to edit the assembly would be a silly idea.
 We still wanted to satisfy one of the most important considerations of instrumentation which is to have minimal impact on the natural code.
 We designed a single line of code which can be inserted into the code for any desired system call which will perform the recording.
 
