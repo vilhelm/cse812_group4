@@ -129,6 +129,16 @@ Image:         portmap UID: 0001 Count: +++       3
 \label{sec:design}
 We now present the basic design of our software as well as the implementation details.
 To effectively implement an instrumentation, we need a data structure for storing the statistics, a simple code modification to record each system call, and a useful display of the statistics recorded.
+Figure~\ref{fig:figure} demonstrates the basic flow of storing to the custom data structure and displaying the results to the user.
+
+\begin{figure}[t!]
+  \begin{center}
+    \includegraphics[trim=120 230 90 50, clip, width=1.0\linewidth]{figure.png}
+    \vspace{-0.18in}
+  \end{center}
+  \caption{Flowchart of program flow.}
+  \label{fig:figure}
+\end{figure}
 
 \subsection{Data Structure}
 To record the system call, we add a new file, \textit{kernel/sys\_stat.c}, to the kernel which contains two external functions.

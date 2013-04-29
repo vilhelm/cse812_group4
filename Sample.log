@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  28 APR 2013 20:52
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  28 APR 2013 21:52
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -360,10 +360,19 @@ LaTeX Font Info:    Try loading font information for OT1+pcr on input line 92.
 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-) [1{/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+)
+<figure.png, id=1, 963.6pt x 722.7pt>
+File: figure.png Graphic file (type png)
+ <use figure.png>
+Package pdftex.def Info: figure.png used on input line 136.
+(pdftex.def)             Requested size: 246.11633pt x 144.39018pt.
+ [1{/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
-] [2]
+]
+Underfull \vbox (badness 1424) has occurred while \output is active []
+
+ [2 <./figure.png>]
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -381,10 +390,10 @@ LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 4061 strings out of 493633
- 57383 string characters out of 3143378
- 145287 words of memory out of 3000000
- 7287 multiletter control sequences out of 15000+200000
+ 4068 strings out of 493633
+ 57468 string characters out of 3143378
+ 144295 words of memory out of 3000000
+ 7293 multiletter control sequences out of 15000+200000
  44265 words of font info for 95 fonts, out of 3000000 for 9000
  835 hyphenation exceptions out of 8191
  38i,8n,25p,313b,366s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -398,10 +407,10 @@ xmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/f
 onts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type
 1/urw/times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/time
 s/utmri8a.pfb>
-Output written on Sample.pdf (3 pages, 110853 bytes).
+Output written on Sample.pdf (3 pages, 133788 bytes).
 PDF statistics:
- 51 PDF objects out of 1000 (max. 8388607)
- 36 compressed objects within 1 object stream
+ 56 PDF objects out of 1000 (max. 8388607)
+ 38 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 12 words of extra memory for PDF output out of 10000 (max. 10000000)
 
