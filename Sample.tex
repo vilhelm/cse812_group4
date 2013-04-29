@@ -3,6 +3,9 @@
 \usepackage{stmaryrd}
 \usepackage{amsfonts}
 \usepackage[boxed, vlined]{algorithm2e}
+\usepackage{listings}
+
+
 % If the IEEEtran.cls has not been installed into the LaTeX system files,
 % manually specify the path to it: e.g.,
 % \documentclass[conference]{../sty/IEEEtran}
@@ -75,6 +78,40 @@ Then in section~\ref{sec:design}, we give an overview and detailed design of the
 We follow this in section~\ref{sec:evaluation} with an evaluation of the software and sample output.
 Finally, we briefly draw some conclusions in section~\ref{sec:conclusions}.
 
+\begin{figure}[*]
+\begin{lstlisting}
+void addNewRecord(char *comm, int uid, char *sys_call, int sys_call_index)
+{
+        recordPointer[sys_call_index]++;
+        strcpy(record[sys_call_index][recordPointer[sys_call_index]].comm,comm);
+        strcpy(record[sys_call_index][recordPointer[sys_call_index]].sys_call,sys_call);
+        record[sys_call_index][recordPointer[sys_call_index]].uid = uid;
+        if (recordPointer[sys_call_index] >= MAX_RECORDS) recordPointer[sys_call_index] = 0;
+        if (sysCallPointer >= 0) {
+                for (i = 0; i < MAX_SYS_CALLS; i++) {
+                        if (strcmp(record[i][0].sys_call,sys_call) == 0) { // Only do if initialized, and the sys_call is equal
+                                sysCallPresent = true;
+                                if (recordPointer[i] >= 0) {
+                                        for (j = 0; j < MAX_RECORDS; j++) {
+                                                if ((strcmp(record[i][j].comm,comm) == 0) && (record[i][j].uid == uid)) {
+                                                        recordPresent = true;
+                                                        record[i][j].count++;
+                                                        break;
+                                                }
+                                        }
+                                }
+                                if (!recordPresent) {
+                                        addNewRecord(comm,uid,sys_call,i);
+                                        break;
+                                }
+                        }
+                }
+                if (!sysCallPresent) addNewSysCall(comm,uid,sys_call);
+        }
+}
+\end{lstlisting}
+\end{figure}
+
 \section{Background}
 \label{sec:background}
 Instrumentation is not a new subject.
@@ -124,11 +161,16 @@ Image:         portmap UID: 0001 Count: +++       3
 \caption{Sample output from \textit{proc} file}
 \end{algorithm*}
 
-
 \section{Design and Software Development}
 \label{sec:design}
 We now present the basic design of our software as well as the implementation details.
-To effectively implement an instrumentation, we need a data structure for storing the statistics, a simple code modification to record each system call, and a useful display of the statistics recorded.
+To effectively implement an instrumentation, we need a loadable kernel module (LKM), a data structure for storing the statistics, a simple code modification to record each system call, and a useful display of the statistics recorded.
+
+\subsection{Loadable Kernel Module}
+We leverage an LKM to easily insert a proc file to our system, and provide it with a custom read operation.
+Each time the LKM is loaded or unloaded, the \textit{cse812\_clear()} function is called to initialize or reset statistics.
+We use this function to prevent system calls from being recorded constantly.
+That is, without calling the \textit{cse812\_clear()} function when inserting the module statistics are not recorded.
 
 \subsection{Data Structure}
 To record the system call, we add a new file, \textit{kernel/sys\_stat.c}, to the kernel which contains two external functions.
